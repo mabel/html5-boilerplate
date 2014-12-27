@@ -2,6 +2,8 @@ var fs = require('fs');
 var path = require('path');
 
 var gulp = require('gulp');
+var concat = require('gulp-concat');
+var minifyCSS = require('gulp-minify-css');
 var plugins = require('gulp-load-plugins')(); // Load all gulp plugins
                                               // automatically and attach
                                               // them to the `plugins` object
@@ -66,9 +68,11 @@ gulp.task('copy', [
     'copy:.htaccess',
     'copy:index.html',
     'copy:jquery',
+    'copy:require',
+    'copy:underscore',
+    'copy:backbone',
     'copy:main.css',
-    'copy:misc',
-    'copy:normalize'
+    'copy:misc'
 ]);
 
 gulp.task('copy:.htaccess', function () {
@@ -89,13 +93,30 @@ gulp.task('copy:jquery', function () {
                .pipe(gulp.dest(dirs.dist + '/js/vendor'));
 });
 
+gulp.task('copy:require', function () {
+    return gulp.src(['node_modules/requirejs/require.js'])
+               .pipe(gulp.dest(dirs.dist + '/js/vendor'));
+});
+
+gulp.task('copy:underscore', function () {
+    return gulp.src(['node_modules/underscore/underscore-min.js'])
+               .pipe(gulp.dest(dirs.dist + '/js/vendor'));
+});
+
+gulp.task('copy:backbone', function () {
+    return gulp.src(['node_modules/backbone/backbone-min.js'])
+               .pipe(gulp.dest(dirs.dist + '/js/vendor'));
+});
+
 gulp.task('copy:main.css', function () {
 
     var banner = '/*! HTML5 Boilerplate v' + pkg.version +
                     ' | ' + pkg.license.type + ' License' +
                     ' | ' + pkg.homepage + ' */\n\n';
 
-    return gulp.src(dirs.src + '/css/main.css')
+    return gulp.src(['node_modules/normalize.css/normalize.css', dirs.src + '/css/main.css'])
+               .pipe(concat('main.css'))
+               .pipe(minifyCSS({keepBreaks: true}))
                .pipe(plugins.header(banner))
                .pipe(gulp.dest(dirs.dist + '/css'));
 
@@ -120,16 +141,14 @@ gulp.task('copy:misc', function () {
     }).pipe(gulp.dest(dirs.dist));
 });
 
-gulp.task('copy:normalize', function () {
+/*gulp.task('copy:normalize', function () {
     return gulp.src('node_modules/normalize.css/normalize.css')
                .pipe(gulp.dest(dirs.dist + '/css'));
-});
+});*/
 
 gulp.task('lint:js', function () {
     return gulp.src([
-        'gulpfile.js',
-        dirs.src + '/js/*.js',
-        dirs.test + '/*.js'
+        'gulpfile.js'
     ]).pipe(plugins.jscs())
       .pipe(plugins.jshint())
       .pipe(plugins.jshint.reporter('jshint-stylish'))
@@ -151,7 +170,7 @@ gulp.task('archive', function (done) {
 
 gulp.task('build', function (done) {
     runSequence(
-        ['clean', 'lint:js'],
+        ['clean'],
         'copy',
     done);
 });
