@@ -84,13 +84,11 @@ gulp.task('copy:.htaccess', function () {
 
 gulp.task('copy:index.html', function () {
     return gulp.src(dirs.src + '/index.html')
-               .pipe(plugins.replace(/{{JQUERY_VERSION}}/g, pkg.devDependencies.jquery))
                .pipe(gulp.dest(dirs.dist));
 });
 
 gulp.task('copy:jquery', function () {
     return gulp.src(['node_modules/jquery/dist/jquery.min.js'])
-               .pipe(plugins.rename('jquery-' + pkg.devDependencies.jquery + '.min.js'))
                .pipe(gulp.dest(dirs.dist + '/js/vendor'));
 });
 
@@ -112,7 +110,7 @@ gulp.task('copy:backbone', function () {
 gulp.task('copy:main.css', function () {
 
     return gulp.src(['node_modules/normalize.css/normalize.css', dirs.src + '/css/main.css'])
-               .pipe(concat('combined.css'))
+               .pipe(concat('load-it-first.css'))
                .pipe(minifyCSS({keepBreaks: true}))
                .pipe(gulp.dest(dirs.dist + '/css'));
 
@@ -120,8 +118,8 @@ gulp.task('copy:main.css', function () {
 
 gulp.task('copy:vendor.js', function () {
 
-    return gulp.src(['node_modules/modernizr/dist/modernizr-build.js', dirs.src + '/js/vendor/h5bp.js', 'node_modules/requirejs/require.js'])
-               .pipe(concat('combined.js'))
+    return gulp.src([dirs.src + '/js/vendor/modernizr-latest.js', dirs.src + '/js/vendor/h5bp.js', 'node_modules/requirejs/require.js'])
+               .pipe(concat('load-it-first.js'))
                .pipe(uglify())
                .pipe(gulp.dest(dirs.dist + '/js/vendor'));
 
@@ -136,6 +134,8 @@ gulp.task('copy:misc', function () {
         // Exclude the following files
         // (other tasks will handle the copying of these files)
         '!' + dirs.src + '/css/main.css',
+        '!' + dirs.src + '/js/vendor/h5bp.js',
+        '!' + dirs.src + '/js/vendor/modernizr-latest.js',
         '!' + dirs.src + '/index.html'
 
     ], {
