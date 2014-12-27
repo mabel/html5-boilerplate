@@ -2,16 +2,20 @@ requirejs.config({
   waitSeconds: 30,
   baseUrl: 'js',
   paths: {
-	h5bp: 'vendor/h5bp',
-	modernizr: 'vendor/modernizr-2.8.3.min'
-	backbonbe: 'vendor/backbone-min',
-	jquery: 'vendor/jquery-2.1.3.min',
-	underscore: 'vendor/underscore-min'
+	backbonbe:  'vendor/backbone-min',
+	underscore: 'vendor/underscore-min',
+	jquery:     'vendor/jquery-.min',
+	boxes:      '02_boxes',
+	css:        '03_css',
+	i18n:       '90_i18n',
+	finish:     '99_finish',
   },
 
   shim: {
 	backbone: {deps: ['underscore']},
+	i18n: {deps: ['boxes']},
+	finish: {deps: ['i18n']},
   }
 });
 
-require(['h5bp', 'modernizr']);
+require(['finish']);

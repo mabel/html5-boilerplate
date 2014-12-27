@@ -3,6 +3,7 @@ var path = require('path');
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 var minifyCSS = require('gulp-minify-css');
 var plugins = require('gulp-load-plugins')(); // Load all gulp plugins
                                               // automatically and attach
@@ -68,10 +69,10 @@ gulp.task('copy', [
     'copy:.htaccess',
     'copy:index.html',
     'copy:jquery',
-    'copy:require',
     'copy:underscore',
     'copy:backbone',
     'copy:main.css',
+    'copy:vendor.js',
     'copy:misc'
 ]);
 
@@ -110,15 +111,19 @@ gulp.task('copy:backbone', function () {
 
 gulp.task('copy:main.css', function () {
 
-    var banner = '/*! HTML5 Boilerplate v' + pkg.version +
-                    ' | ' + pkg.license.type + ' License' +
-                    ' | ' + pkg.homepage + ' */\n\n';
-
     return gulp.src(['node_modules/normalize.css/normalize.css', dirs.src + '/css/main.css'])
-               .pipe(concat('main.css'))
+               .pipe(concat('combined.css'))
                .pipe(minifyCSS({keepBreaks: true}))
-               .pipe(plugins.header(banner))
                .pipe(gulp.dest(dirs.dist + '/css'));
+
+});
+
+gulp.task('copy:vendor.js', function () {
+
+    return gulp.src(['node_modules/modernizr/dist/modernizr-build.js', dirs.src + '/js/vendor/h5bp.js', 'node_modules/requirejs/require.js'])
+               .pipe(concat('combined.js'))
+               .pipe(uglify())
+               .pipe(gulp.dest(dirs.dist + '/js/vendor'));
 
 });
 
